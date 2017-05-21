@@ -34,8 +34,6 @@ today = t.strftime('%Y-%m-%d')
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       #cFolder = 'C:\\Users\\EDWARDS\\Desktop'
 #cFolder = 'C:\\User\\'+getpass.getuser()+'\\Desktop'
 #cFolder = 'C:\\User\\'+getpass.getuser()+'\\Downloads\\'
-#cFolder = 'C:\\Users\\davidedwards\\Auction Technology Group\\OneDrive - Auction Technology Group\\Laptop\\Desktop'
-#cFolder = 'C:\\Users\\'+getpass.getuser()+'\\Auction Technology Group\\OneDrive - Auction Technology Group\\Laptop\\Desktop'
 cFolder = 'https://atgmedia-my.sharepoint.com/personal//'+getpass.getuser()+'_auctiontechnologygroup_com//Documents//Laptop//Desktop//'
 wkbk = os.path.expanduser(cFolder)
 
@@ -113,7 +111,7 @@ xlOpenXMLWorkbookMacroEnabled = 52
 xlmodule = wb.VBProject.VBComponents.Add(1)
 
 # ...VBA code...
-sCode = '''Sub TidyConverter()
+VBA = '''Sub TidyConverter()
 Dim wb As Workbook: Set wb = ThisWorkbook
 Dim ws As Worksheet: Set ws = wb.Sheets(1)
 Dim i As Long, lasti As Long
@@ -148,7 +146,7 @@ For i = 1 To lasti
 Next i
 End Sub'''
 
-# Saving my created instance of a Macro-enabled workbook for eventual population of data
+# Saving my created instance of a Macro-enabled workbook for eventual population with data
 wb.SaveAs(wkbk +" Weather Book - "+today+".xlsm", FileFormat=xlOpenXMLWorkbookMacroEnabled)
 xl.Visible = True
 wb.Worksheets.Add()
@@ -193,7 +191,7 @@ for k,v in location.items():                  # For each country(k) and capital(
     nrow2 = nrow+1
     nrow3 = nrow2+1
 
-xlmodule.CodeModule.AddFromString(sCode)     # Now to insert our VBA code into a module
+xlmodule.CodeModule.AddFromString(VBA)     # Now to insert our VBA code into a module
 xl.Application.Run("TidyConverter")          # Running that VBA code to clean up the data
 
 wb.Save()                                    # Saving...
