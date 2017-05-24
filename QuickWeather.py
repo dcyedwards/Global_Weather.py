@@ -196,7 +196,7 @@ xl.Application.Run("TidyConverter")          # Running that VBA code to clean up
 
 wb.Save()                                    # Saving...
 xl.DisplayAlerts = True
-xl.Quit()                                    # And done
+wb.Close(True) # or xl.Quit() to close Excel# And done
 number_of_countries = [v for v in location.values()]
 print('\nWeather data downloaded for '+str(len(number_of_countries))+' countries')
 
