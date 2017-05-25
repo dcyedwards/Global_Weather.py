@@ -165,38 +165,42 @@ sht2.Range('A4').Value = 'Column B = Temperature in Celcius °C, Pressure in Hec
 sht2.Range('A5').Value = 'Column C = Unit of measurement symbol'
 
 # Now for some iterative logic:
-for k,v in location.items():                  # For each country(k) and capital(v)...
-    response = requests.get(url+v+appid+key)  # The response we want from our API (i.e.: from the weather website) is built up of a URL and API key
-    response.raise_for_status()               # Just a check to make sure there's a response from the website (A response code of 200 is good. Anything else, not so good)
-    response                                  # All the data for each country and capital is stored in the 'response' variable.
-    weatherData = json.loads(response.text)   # Now, as this data is in the json data format, we load it into Python using the loads(loads = load string) into the 'weatherData' variable.
-    w = weatherData                           # Using a shorter variable name for ease of writing really.
-    print('\n')
-    print(w['name'])                          # Now, the data is in a Python dictionary. I select the elements in the dictionary of interest beginning with the 'name' key.
-    sht.Range('A'+str(nrow)).Value = w['name']# Writing the data from the dictionary to our Excel workbook
-    sht.Range('C'+str(nrow)).Value = 'Country:'
-    sht.Range('D'+str(nrow)).Value = k
-    print(w['weather'][0]['main'])
-    sht.Range('A'+str(nrow2)).Value = w['weather'][0]['main']
-    for k,v in w['main'].items():
-        print(str(k),str(v))
-        sht.Range('A'+str(nrow3)+':A'+str(int(nrow3)+4)).Value = [[k] for k in w['main'].keys()]
-        sht.Range('B'+str(nrow3)+':B'+str(int(nrow3)+4)).Value = [[v] for v in w['main'].values()]
-        d = list(w['main'].values())          # Creating a list of the temperatures, pressures and humidity values and assigning to a variable 'd'| I don't really need these but I do it to check values in IDLE just in case.
-        dlist = d[1:5]                        # Selecting the 2nd to 5th values from that list                                                    |  
-        #sht.Range('C'+str(int(nrow3)+1)+':C'+str(int(nrow3)+3)).Value = [[temp-273.15] for temp in dlist] # Converting the temperatures from Kelvin to Degrees Celcius[Deprecated] - I do this using VBA instead.
-    used = sht.UsedRange
-    nrow = used.Row + used.Rows.Count-1
-    nrow = nrow + 2
-    nrow2 = nrow+1
-    nrow3 = nrow2+1
+try:
+    for k,v in location.items():
+        response = requests.get(url+v+appid+key)  # The response we want from our API (i.e.: from the weather website) is built up of a URL and API key
+        response.raise_for_status()               # Just a check to make sure there's a response from the website (A response code of 200 is good. Anything else, not so good)
+        response                                  # All the data for each country and capital is stored in the 'response' variable.
+        weatherData = json.loads(response.text)   # Now, as this data is in the json data format, we load it into Python using the loads(loads = load string) into the 'weatherData' variable.
+        w = weatherData                           # Using a shorter variable name for ease of writing really.
+        ExceptionCounter = 0
+        print('\n')
+        print(w['name'])                          # Now, the data is in a Python dictionary. I select the elements in the dictionary of interest beginning with the 'name' key.
+        sht.Range('A'+str(nrow)).Value = w['name']# Writing the data from the dictionary to our Excel workbook
+        sht.Range('C'+str(nrow)).Value = 'Country:'
+        sht.Range('D'+str(nrow)).Value = k
+        print(w['weather'][0]['main'])
+        sht.Range('A'+str(nrow2)).Value = w['weather'][0]['main']
+        for k,v in w['main'].items():
+            print(str(k),str(v))
+            sht.Range('A'+str(nrow3)+':A'+str(int(nrow3)+4)).Value = [[k] for k in w['main'].keys()]
+            sht.Range('B'+str(nrow3)+':B'+str(int(nrow3)+4)).Value = [[v] for v in w['main'].values()]
+            d = list(w['main'].values())          # Creating a list of the temperatures, pressures and humidity values and assigning to a variable 'd'| I don't really need these but I do it to check values in IDLE just in case.
+            dlist = d[1:5]                        # Selecting the 2nd to 5th values from that list                                                    |                                               
+        used = sht.UsedRange                      #sht.Range('C'+str(int(nrow3)+1)+':C'+str(int(nrow3)+3)).Value = [[temp-273.15] for temp in dlist] # Converting the temperatures from Kelvin to Degrees Celcius[Deprecated] - I do this using VBA instead.
+        nrow = used.Row + used.Rows.Count-1
+        nrow = nrow + 2
+        nrow2 = nrow+1
+        nrow3 = nrow2+1# For each country(k) and capital(v)...
+except Exception:
+    ExceptionCounter += 1
+    pass
 
-xlmodule.CodeModule.AddFromString(VBA)     # Now to insert our VBA code into a module
+xlmodule.CodeModule.AddFromString(VBA)       # Now to insert our VBA code into a module
 xl.Application.Run("TidyConverter")          # Running that VBA code to clean up the data
 
 wb.Save()                                    # Saving...
 xl.DisplayAlerts = True
 wb.Close(True) # or xl.Quit() to close Excel# And done
 number_of_countries = [v for v in location.values()]
-print('\nWeather data downloaded for '+str(len(number_of_countries))+' countries')
+print('\nWeather data downloaded for '+str(len(number_of_countries)- ExceptionCounter)+' countries')
 
